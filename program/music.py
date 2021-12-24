@@ -53,8 +53,8 @@ async def play(c: Client, m: Message):
     replied = m.reply_to_message
     chat_id = m.chat.id
     idd = m.from_user.id
-    ch = "DD0DD"
-    res = urllib.urlopen("https://api.telegram.org/bot{}/getChatMember?chat_id={}&user_id={}".format(Client,ch,idd)).read()
+    ch = "b666P"
+    res = urllib.urlopen("https://api.telegram.org/bot1460820038:AAGUWQoRfKnB90j_fcWGmnpyFcxNDHxRO4Q/getChatMember?chat_id=@b666P&user_id={}".format(Client,ch,idd)).read()
     o = json.loads(res)
     r = o['reslt']['status']
     if r == 'left':
