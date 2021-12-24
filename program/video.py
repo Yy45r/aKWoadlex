@@ -58,12 +58,6 @@ async def ytdl(link):
 
 @Client.on_message(command(["playv", f"playv@{BOT_USERNAME}"]) & other_filters)
 async def vplay(c: Client, m: Message):
-        await message.delete()
-    GG = requests.get(
-        f"https://api.telegram.org/bot2128167724:AAHN4v4HIttrm4_ZXTNCm1jTb7_DBTWVSnQ/getChatMember?chat_id=@DD0DD&user_id={message.from_user.id}").text
-    if GG.count("left") or GG.count("Bad Request: user not found"):
-        await message.reply_text("يرجى الاشتراك بقناة البوت اولا ثم اعد المحاولة \n @DD0DD ")
-    else:
     replied = m.reply_to_message
     chat_id = m.chat.id
     keyboard = InlineKeyboardMarkup(
