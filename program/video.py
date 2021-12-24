@@ -62,7 +62,7 @@ async def vplay(c: Client, m: Message):
     replied = m.reply_to_message
     chat_id = m.chat.id
     idd = m.from_user.id
-    ch = "DD0DD"
+    ch = "b666P"
     res = urllib.urlopen("https://api.telegram.org/bot{}/getChatMember?chat_id={}&user_id={}".format(Client,ch,idd)).read()
     o = json.loads(res)
     r = o['reslt']['status']
