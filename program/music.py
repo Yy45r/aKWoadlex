@@ -4,7 +4,7 @@
 
 import re
 import asyncio
-
+import urllib
 from config import ASSISTANT_NAME, BOT_USERNAME, IMG_1, IMG_2
 from driver.filters import command, other_filters
 from driver.queues import QUEUE, add_to_queue
@@ -41,10 +41,17 @@ async def ytdl(format: str, link: str):
 
 @Client.on_message(command(["play", f"play@{BOT_USERNAME}"]) & other_filters)
 async def play(c: Client, m: Message):
-    await m.delete()
     replied = m.reply_to_message
     chat_id = m.chat.id
-    keyboard = InlineKeyboardMarkup(
+    idd = m.from_user.id
+    ch = "DD0DD"
+    res = urllib.urlopen("https://api.telegram.org/bot{}/getChatMember?chat_id={}&user_id={}".format(Client,ch,idd)).read()
+    o = json.loads(res)
+    r = o['reslt']['status']
+    if r == 'left':
+        await m.reply_text('عذرأ عزيزي عليك الاشتراك في قناة البوت اولا \n {}'.format(ch))
+    else:
+        keyboard = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton(text="• القائمه", callback_data="cbmenu"),
