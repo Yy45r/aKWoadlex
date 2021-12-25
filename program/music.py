@@ -39,19 +39,12 @@ async def ytdl(format: str, link: str):
     return 0, stderr
 
 
-@Client.on_message(command(["play", f"play@{BOT_USERNAME}"]) & other_filters)
+@Client.on_message(command(["mplay", f"mplay@{BOT_USERNAME}"]) & other_filters)
 async def play(c: Client, m: Message):
     await m.delete()
     replied = m.reply_to_message
     chat_id = m.chat.id
-    ch = "DD0DD"
-    res = urllib.urlopen("https://api.telegram.org/bot{}/getChatMember?chat_id={}&user_id={}".format(Client,ch,idd)).read()
-    o = json.loads(res)
-    r = o['reslt']['status']
-    if r == 'left':
-        await m.reply_text('عذرأ عزيزي عليك الاشتراك في قناة البوت اولا \n {}'.format(ch))
-    else:
-        keyboard = InlineKeyboardMarkup(
+    keyboard = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton(text="• Mᴇɴᴜ", callback_data="cbmenu"),
