@@ -54,225 +54,170 @@ async def ytdl(link):
         return 0, stderr.decode()
 
 
-@Client.on_message(command(["playv", f"playv@{BOT_USERNAME}"]) & other_filters)
+@Client.on_message(command(["vplay", f"vplay@{BOT_USERNAME}"]) & other_filters)
 async def vplay(c: Client, m: Message):
+    await m.delete()
     replied = m.reply_to_message
     chat_id = m.chat.id
-    idd = m.from_user.id
-    ch = "DD0DD"
-    res = urllib.urlopen("https://api.telegram.org/bot{}/getChatMember?chat_id={}&user_id={}".format(Client,ch,idd)).read()
-    o = json.loads(res)
-    r = o['reslt']['status']
-    if r == 'left':
-        await m.reply_text('عذرأ عزيزي عليك الاشتراك في قناة البوت اولا \n {}'.format(ch))
-    else:
-        keyboard = InlineKeyboardMarkup(
+    keyboard = InlineKeyboardMarkup(
+        [
             [
-                [
-                    InlineKeyboardButton(text="• Mᴇɴᴜ", callback_data="cbmenu"),
-                    InlineKeyboardButton(text="• Cʟᴏsᴇ", callback_data="cls"),
-                ]
+                InlineKeyboardButton(text="• Mᴇɴᴜ", callback_data="cbmenu"),
+                InlineKeyboardButton(text="• Cʟᴏsᴇ", callback_data="cls"),
             ]
+        ]
+    )
+    if m.sender_chat:
+        return await m.reply_text("you're an __Anonymous__ Admin !\n\n» revert back to user account from admin rights.")
+    try:
+        aing = await c.get_me()
+    except Exception as e:
+        return await m.reply_text(f"error:\n\n{e}")
+    a = await c.get_chat_member(chat_id, aing.id)
+    if a.status != "administrator":
+        await m.reply_text(
+            f"💡 To use me, I need to be an **Administrator** with the following **permissions**:\n\n» ❌ __Delete messages__\n» ❌ __Add users__\n» ❌ __Manage video chat__\n\nData is **updated** automatically after you **promote me**"
         )
-        if m.sender_chat:
-            return await m.reply_text("أنت __مسؤول مجهول__ !\n\n» ارجع إلى حساب المستخدم من حقوق المسؤول.")
-        try:
-            aing = await c.get_me()
-        except Exception as e:
-            return await m.reply_text(f"error:\n\n{e}")
-        a = await c.get_chat_member(chat_id, aing.id)
-        if a.status != "administrator":
+        return
+    if not a.can_manage_voice_chats:
+        await m.reply_text(
+            "missing required permission:" + "\n\n» ❌ __Manage video chat__"
+        )
+        return
+    if not a.can_delete_messages:
+        await m.reply_text(
+            "missing required permission:" + "\n\n» ❌ __Delete messages__"
+        )
+        return
+    if not a.can_invite_users:
+        await m.reply_text("missing required permission:" + "\n\n» ❌ __Add users__")
+        return
+    try:
+        ubot = (await user.get_me()).id
+        b = await c.get_chat_member(chat_id, ubot)
+        if b.status == "kicked":
             await m.reply_text(
-                f"💡لاستخدامي ، أحتاج إلى أن أكون ** مسؤول ** مع ما يلي**:\n\n» ❌ __حذف الرسائل__\n» ❌ __أضف المستخدمين__\n» ❌ __إدارة دردشة الفيديو__\n\nيتم تحديث البيانات ** تلقائيًا بعد ترقيتك ****"
+                f"@{ASSISTANT_NAME} **is banned in group** {m.chat.title}\n\n» **unban the userbot first if you want to use this bot.**"
             )
             return
-        if not a.can_manage_voice_chats:
-            await m.reply_text(
-                "missing required permission:" + "\n\n» ❌ _إدارة دردشة الفيديو__"
-            )
-            return
-        if not a.can_delete_messages:
-            await m.reply_text(
-                "missing required permission:" + "\n\n» ❌ __حذف الرسائل__"
-            )
-            return
-        if not a.can_invite_users:
-            await m.reply_text("missing required permission:" + "\n\n» ❌ __ضف المستخدمين__")
-            return
-        try:
-            ubot = await user.get_me()
-            b = await c.get_chat_member(chat_id, ubot.id)
-            if b.status == "kicked":
-                await m.reply_text(
-                    f"@{ASSISTANT_NAME} **محظور في المجموعة** {m.chat.title}\n\n» **قم بفك حظر المستخدم أولاً إذا كنت تريد استخدام هذا الروبوت.**"
-                )
+    except UserNotParticipant:
+        if m.chat.username:
+            try:
+                await user.join_chat(m.chat.username)
+            except Exception as e:
+                await m.reply_text(f"❌ **userbot failed to join**\n\n**reason**: `{e}`")
                 return
-        except UserNotParticipant:
-            if m.chat.username:
-                try:
-                    await user.join_chat(m.chat.username)
-                except Exception as e:
-                    await m.reply_text(f"❌ *فشل البوت في الانضمام**\n\n**السبب**: `{e}`")
-                    return
-            else:
-                try:
-                    pope = await c.export_chat_invite_link(chat_id)
-                    pepo = await c.revoke_chat_invite_link(chat_id, pope)
-                    await user.join_chat(pepo.invite_link)
-                except UserAlreadyParticipant:
-                    pass
-                except Exception as e:
-                    return await m.reply_text(
-                        f"❌ **فشل البوت في الانضمام**\n\n**السبب**: `{e}`"
+        else:
+            try:
+                invitelink = await c.export_chat_invite_link(
+                    m.chat.id
+                )
+                if invitelink.startswith("https://t.me/+"):
+                    invitelink = invitelink.replace(
+                        "https://t.me/+", "https://t.me/joinchat/"
                     )
+                await user.join_chat(invitelink)
+            except UserAlreadyParticipant:
+                pass
+            except Exception as e:
+                return await m.reply_text(
+                    f"❌ **userbot failed to join**\n\n**reason**: `{e}`"
+                )
 
-        if replied:
-            if replied.video or replied.document:
-                loser = await replied.reply("📥 **تحميل الفيديو...**")
-                dl = await replied.download()
-                link = replied.link
-                if len(m.command) < 2:
-                    Q = 720
-                else:
-                    pq = m.text.split(None, 1)[1]
-                    if pq == "720" or "480" or "360":
-                        Q = int(pq)
-                    else:
-                        Q = 720
-                        await loser.edit(
-                            "» __only 720, 480, 360 allowed__ \n💡 * الآن يتدفقون الفيديو بدقة 720 بكسل**"
-                        )
-                try:
-                    if replied.video:
-                        songname = replied.video.file_name[:70]
-                    elif replied.document:
-                        songname = replied.document.file_name[:70]
-                except BaseException:
-                    songname = "Video"
-
-                if chat_id in QUEUE:
-                    pos = add_to_queue(chat_id, songname, dl, link, "Video", Q)
-                    await loser.delete()
-                    requester = f"[{m.from_user.first_name}](tg://user?id={m.from_user.id})"
-                    await m.reply_photo(
-                        photo=f"{IMG_1}",
-                        caption=f"💡 **تمت إضافة المسار إلى قائمة الانتظار »** `{pos}`\n\n🏷 **الاسم:** [{songname}]({link})\n💭 **الدردشه:** `{chat_id}`\n🎧 **بواسطه:** {requester}",
-                        reply_markup=keyboard,
-                    )
-                else:
-                    if Q == 720:
-                        amaze = HighQualityVideo()
-                    elif Q == 480:
-                        amaze = MediumQualityVideo()
-                    elif Q == 360:
-                        amaze = LowQualityVideo()
-                    await loser.edit("🔄 **انضمام vc...**")
-                    await call_py.join_group_call(
-                        chat_id,
-                        AudioVideoPiped(
-                            dl,
-                            HighQualityAudio(),
-                            amaze,
-                        ),
-                        stream_type=StreamType().local_stream,
-                    )
-                    add_to_queue(chat_id, songname, dl, link, "Video", Q)
-                    await loser.delete()
-                    requester = f"[{m.from_user.first_name}](tg://user?id={m.from_user.id})"
-                    await m.reply_photo(
-                        photo=f"{IMG_2}",
-                        caption=f"💡 **بدأ تشغيل الفيديو.**\n\n🏷 **الاسم:** [{songname}]({link})\n💭 **الدردشه:** `{chat_id}`\n💡 **Status:** `يشغل`\n🎧 **بواسطه:** {requester}",
-                        reply_markup=keyboard,
-                    )
+    if replied:
+        if replied.video or replied.document:
+            loser = await replied.reply("📥 **downloading video...**")
+            dl = await replied.download()
+            link = replied.link
+            if len(m.command) < 2:
+                Q = 720
             else:
-                if len(m.command) < 2:
-                    await m.reply(
-                        "»الرد على ** ملف فيديو ** أو ** أعط شيئًا للبحث**"
-                    )
+                pq = m.text.split(None, 1)[1]
+                if pq == "720" or "480" or "360":
+                    Q = int(pq)
                 else:
-                    loser = await c.send_message(chat_id, "🔎 **يبحث...**")
-                    query = m.text.split(None, 1)[1]
-                    search = ytsearch(query)
                     Q = 720
+                    await loser.edit(
+                        "» __only 720, 480, 360 allowed__ \n💡 **now streaming video in 720p**"
+                    )
+            try:
+                if replied.video:
+                    songname = replied.video.file_name[:70]
+                elif replied.document:
+                    songname = replied.document.file_name[:70]
+            except BaseException:
+                songname = "Video"
+
+            if chat_id in QUEUE:
+                pos = add_to_queue(chat_id, songname, dl, link, "Video", Q)
+                await loser.delete()
+                requester = f"[{m.from_user.first_name}](tg://user?id={m.from_user.id})"
+                await m.reply_photo(
+                    photo=f"{IMG_1}",
+                    caption=f"💡 **Track added to queue »** `{pos}`\n\n🏷 **Name:** [{songname}]({link}) | `video`\n💭 **Chat:** `{chat_id}`\n🎧 **Request by:** {requester}",
+                    reply_markup=keyboard,
+                )
+            else:
+                if Q == 720:
                     amaze = HighQualityVideo()
-                    if search == 0:
-                        await loser.edit("❌ *م يتم العثور على نتائج.**")
-                    else:
-                        songname = search[0]
-                        url = search[1]
-                        amort, ytlink = await ytdl(url)
-                        if amort == 0:
-                            await loser.edit(f"❌ تم اكتشاف مشكلات yt-dl\n\n» `{ytlink}`")
-                        else:
-                            if chat_id in QUEUE:
-                                pos = add_to_queue(
-                                    chat_id, songname, ytlink, url, "Video", Q
-                                )
-                                await loser.delete()
-                                requester = f"[{m.from_user.first_name}](tg://user?id={m.from_user.id})"
-                                await m.reply_photo(
-                                    photo=f"{IMG_1}",
-                                    caption=f"💡 **تمت إضافة المسار إلى قائمة الانتظار »** `{pos}`\n\n🏷 **الاسم:** [{songname}]({url})\n💭 **الدردشه:** `{chat_id}`\n🎧 **بواسطه:** {requester}",
-                                    reply_markup=keyboard,
-                                )
-                            else:
-                                try:
-                                    await loser.edit("🔄 **الانضمام إلى vc...**")
-                                    await call_py.join_group_call(
-                                        chat_id,
-                                        AudioVideoPiped(
-                                            ytlink,
-                                            HighQualityAudio(),
-                                            amaze,
-                                        ),
-                                        stream_type=StreamType().local_stream,
-                                    )
-                                    add_to_queue(chat_id, songname, ytlink, url, "Video", Q)
-                                    await loser.delete()
-                                    requester = f"[{m.from_user.first_name}](tg://user?id={m.from_user.id})"
-                                    await m.reply_photo(
-                                        photo=f"{IMG_2}",
-                                        caption=f"💡 ** بدأ تشغيل الفيديو.**\n\n🏷 **الاسم:** [{songname}]({url})\n💭 **الدردشه:** `{chat_id}`\n💡 **الحاله:** `يشغل`\n🎧 **بواسطه:** {requester}",
-                                        reply_markup=keyboard,
-                                    )
-                                except Exception as ep:
-                                    await loser.delete()
-                                    await m.reply_text(f"🚫 خطأ: `{ep}`")
-
+                elif Q == 480:
+                    amaze = MediumQualityVideo()
+                elif Q == 360:
+                    amaze = LowQualityVideo()
+                await loser.edit("🔄 **Joining vc...**")
+                await call_py.join_group_call(
+                    chat_id,
+                    AudioVideoPiped(
+                        dl,
+                        HighQualityAudio(),
+                        amaze,
+                    ),
+                    stream_type=StreamType().local_stream,
+                )
+                add_to_queue(chat_id, songname, dl, link, "Video", Q)
+                await loser.delete()
+                requester = f"[{m.from_user.first_name}](tg://user?id={m.from_user.id})"
+                await m.reply_photo(
+                    photo=f"{IMG_2}",
+                    caption=f"🏷 **Name:** [{songname}]({link})\n💭 **Chat:** `{chat_id}`\n💡 **Status:** `Playing`\n🎧 **Request by:** {requester}\n📹 **Stream type:** `Video`",
+                    reply_markup=keyboard,
+                )
         else:
             if len(m.command) < 2:
                 await m.reply(
-                    "» الرد على ** ملف فيديو** or **إعطاء شيء للبحث.**"
+                    "» reply to an **video file** or **give something to search.**"
                 )
             else:
-                loser = await c.send_message(chat_id, "🔎 **يبحث...**")
+                loser = await c.send_message(chat_id, "🔍 **Searching...**")
                 query = m.text.split(None, 1)[1]
                 search = ytsearch(query)
                 Q = 720
                 amaze = HighQualityVideo()
                 if search == 0:
-                    await loser.edit("❌ **لم يتم العثور على نتائج.**")
+                    await loser.edit("❌ **no results found.**")
                 else:
                     songname = search[0]
                     url = search[1]
-                    amort, ytlink = await ytdl(url)
-                    if amort == 0:
-                        await loser.edit(f"❌تم اكتشاف مشكلات yt-dl\n\n» `{ytlink}`")
+                    duration = search[2]
+                    thumbnail = search[3]
+                    veez, ytlink = await ytdl(url)
+                    if veez == 0:
+                        await loser.edit(f"❌ yt-dl issues detected\n\n» `{ytlink}`")
                     else:
                         if chat_id in QUEUE:
-                            pos = add_to_queue(chat_id, songname, ytlink, url, "Video", Q)
-                            await loser.delete()
-                            requester = (
-                                f"[{m.from_user.first_name}](tg://user?id={m.from_user.id})"
+                            pos = add_to_queue(
+                                chat_id, songname, ytlink, url, "Video", Q
                             )
+                            await loser.delete()
+                            requester = f"[{m.from_user.first_name}](tg://user?id={m.from_user.id})"
                             await m.reply_photo(
-                                photo=f"{IMG_1}",
-                                caption=f"💡 **تمت إضافة المسار إلى قائمة الانتظار »** `{pos}`\n\n🏷 **الاسم:** [{songname}]({url})\n💭 **دردشة:** `{chat_id}`\n🎧 **بواسطه:** {requester}",
+                                photo=thumbnail,
+                                caption=f"💡 **Track added to queue »** `{pos}`\n\n🏷 **Name:** [{songname}]({url}) | `video`\n⏱ **Duration:** `{duration}`\n🎧 **Request by:** {requester}",
                                 reply_markup=keyboard,
                             )
                         else:
                             try:
-                                await loser.edit("🔄 **انضمام vc...**")
+                                await loser.edit("🔄 **Joining vc...**")
                                 await call_py.join_group_call(
                                     chat_id,
                                     AudioVideoPiped(
@@ -286,18 +231,75 @@ async def vplay(c: Client, m: Message):
                                 await loser.delete()
                                 requester = f"[{m.from_user.first_name}](tg://user?id={m.from_user.id})"
                                 await m.reply_photo(
-                                    photo=f"{IMG_2}",
-                                    caption=f"💡 **بدأ تشغيل الفيديو.**\n\n🏷 **الاسم:** [{songname}]({url})\n💭 **الدردشه:** `{chat_id}`\n💡 **الحاله:** `يشغل`\n🎧 *بواسطه:** {requester}",
+                                    photo=thumbnail,
+                                    caption=f"🏷 **Name:** [{songname}]({url})\n⏱ **Duration:** `{duration}`\n💡 **Status:** `Playing`\n🎧 **Request by:** {requester}\n📹 **Stream type:** `Video`",
                                     reply_markup=keyboard,
                                 )
                             except Exception as ep:
                                 await loser.delete()
-                                await m.reply_text(f"🚫 خطأ: `{ep}`")
+                                await m.reply_text(f"🚫 error: `{ep}`")
+
+    else:
+        if len(m.command) < 2:
+            await m.reply(
+                "» reply to an **video file** or **give something to search.**"
+            )
+        else:
+            loser = await c.send_message(chat_id, "🔍 **Searching...**")
+            query = m.text.split(None, 1)[1]
+            search = ytsearch(query)
+            Q = 720
+            amaze = HighQualityVideo()
+            if search == 0:
+                await loser.edit("❌ **no results found.**")
+            else:
+                songname = search[0]
+                url = search[1]
+                duration = search[2]
+                thumbnail = search[3]
+                veez, ytlink = await ytdl(url)
+                if veez == 0:
+                    await loser.edit(f"❌ yt-dl issues detected\n\n» `{ytlink}`")
+                else:
+                    if chat_id in QUEUE:
+                        pos = add_to_queue(chat_id, songname, ytlink, url, "Video", Q)
+                        await loser.delete()
+                        requester = (
+                            f"[{m.from_user.first_name}](tg://user?id={m.from_user.id})"
+                        )
+                        await m.reply_photo(
+                            photo=thumbnail,
+                            caption=f"💡 **Track added to queue »** `{pos}`\n\n🏷 **Name:** [{songname}]({url}) | `video`\n⏱ **Duration:** `{duration}`\n🎧 **Request by:** {requester}",
+                            reply_markup=keyboard,
+                        )
+                    else:
+                        try:
+                            await loser.edit("🔄 **Joining vc...**")
+                            await call_py.join_group_call(
+                                chat_id,
+                                AudioVideoPiped(
+                                    ytlink,
+                                    HighQualityAudio(),
+                                    amaze,
+                                ),
+                                stream_type=StreamType().local_stream,
+                            )
+                            add_to_queue(chat_id, songname, ytlink, url, "Video", Q)
+                            await loser.delete()
+                            requester = f"[{m.from_user.first_name}](tg://user?id={m.from_user.id})"
+                            await m.reply_photo(
+                                photo=thumbnail,
+                                caption=f"🏷 **Name:** [{songname}]({url})\n⏱ **Duration:** `{duration}`\n💡 **Status:** `Playing`\n🎧 **Request by:** {requester}\n📹 **Stream type:** `Video`",
+                                reply_markup=keyboard,
+                            )
+                        except Exception as ep:
+                            await loser.delete()
+                            await m.reply_text(f"🚫 error: `{ep}`")
 
 
 @Client.on_message(command(["vstream", f"vstream@{BOT_USERNAME}"]) & other_filters)
 async def vstream(c: Client, m: Message):
-    m.reply_to_message
+    await m.delete()
     chat_id = m.chat.id
     keyboard = InlineKeyboardMarkup(
         [
@@ -308,7 +310,7 @@ async def vstream(c: Client, m: Message):
         ]
     )
     if m.sender_chat:
-        return await m.reply_text("أنت مسؤول __مجهول__ !\n\n» العودة إلى حساب المستخدم من حقوق المسؤول.")
+        return await m.reply_text("you're an __Anonymous__ Admin !\n\n» revert back to user account from admin rights.")
     try:
         aing = await c.get_me()
     except Exception as e:
@@ -316,28 +318,28 @@ async def vstream(c: Client, m: Message):
     a = await c.get_chat_member(chat_id, aing.id)
     if a.status != "administrator":
         await m.reply_text(
-            f"💡 لاستخدامي ، أحتاج إلى أن أكون ** مسؤول ** مع الأذونات ** التالية**:\n\n» ❌ __حذف الرسائل__\n» ❌ __ضف المستخدمين__\n» ❌ __إدارة دردشة الفيديو__\n\nيتم تحديث البيانات ** تلقائيًا بعد ترقيتك ****"
+            f"💡 To use me, I need to be an **Administrator** with the following **permissions**:\n\n» ❌ __Delete messages__\n» ❌ __Add users__\n» ❌ __Manage video chat__\n\nData is **updated** automatically after you **promote me**"
         )
         return
     if not a.can_manage_voice_chats:
         await m.reply_text(
-            "missing required permission:" + "\n\n» ❌ __إدارة دردشة الفيديو__"
+            "missing required permission:" + "\n\n» ❌ __Manage video chat__"
         )
         return
     if not a.can_delete_messages:
         await m.reply_text(
-            "missing required permission:" + "\n\n» ❌ __حذف الرسائلs__"
+            "missing required permission:" + "\n\n» ❌ __Delete messages__"
         )
         return
     if not a.can_invite_users:
-        await m.reply_text("missing required permission:" + "\n\n» ❌ __ضف المستخدمين__")
+        await m.reply_text("missing required permission:" + "\n\n» ❌ __Add users__")
         return
     try:
-        ubot = await user.get_me()
-        b = await c.get_chat_member(chat_id, ubot.id)
+        ubot = (await user.get_me()).id
+        b = await c.get_chat_member(chat_id, ubot)
         if b.status == "kicked":
             await m.reply_text(
-                f"@{ASSISTANT_NAME} **محظور في المجموعة** {m.chat.title}\n\n» **قم بفك حظر المستخدم أولاً إذا كنت تريد استخدام هذا الروبوت.**"
+                f"@{ASSISTANT_NAME} **is banned in group** {m.chat.title}\n\n» **unban the userbot first if you want to use this bot.**"
             )
             return
     except UserNotParticipant:
@@ -345,27 +347,32 @@ async def vstream(c: Client, m: Message):
             try:
                 await user.join_chat(m.chat.username)
             except Exception as e:
-                await m.reply_text(f"❌ ** فشل البوت في الانضمام**\n\n**reason**: `{e}`")
+                await m.reply_text(f"❌ **userbot failed to join**\n\n**reason**: `{e}`")
                 return
         else:
             try:
-                pope = await c.export_chat_invite_link(chat_id)
-                pepo = await c.revoke_chat_invite_link(chat_id, pope)
-                await user.join_chat(pepo.invite_link)
+                invitelink = await c.export_chat_invite_link(
+                    m.chat.id
+                )
+                if invitelink.startswith("https://t.me/+"):
+                    invitelink = invitelink.replace(
+                        "https://t.me/+", "https://t.me/joinchat/"
+                    )
+                await user.join_chat(invitelink)
             except UserAlreadyParticipant:
                 pass
             except Exception as e:
                 return await m.reply_text(
-                    f"❌ **فشل لبوت في الانضمام**\n\n**reason**: `{e}`"
+                    f"❌ **userbot failed to join**\n\n**reason**: `{e}`"
                 )
 
     if len(m.command) < 2:
-        await m.reply("» أعطني رابط مباشر / رابط m3u8 url / youtube للتشغيل..")
+        await m.reply("» give me a live-link/m3u8 url/youtube link to stream.")
     else:
         if len(m.command) == 2:
             link = m.text.split(None, 1)[1]
             Q = 720
-            loser = await c.send_message(chat_id, "🔄 **جاري المعالجة...**")
+            loser = await c.send_message(chat_id, "🔄 **processing stream...**")
         elif len(m.command) == 3:
             op = m.text.split(None, 1)[1]
             link = op.split(None, 1)[0]
@@ -375,22 +382,22 @@ async def vstream(c: Client, m: Message):
             else:
                 Q = 720
                 await m.reply(
-                    "» __only 720, 480, 360 allowed__ \n💡 **لآن يشغل الفيديو بدقة 720 بكسل**"
+                    "» __only 720, 480, 360 allowed__ \n💡 **now streaming video in 720p**"
                 )
-            loser = await c.send_message(chat_id, "🔄 **جاري المعالجة...**")
+            loser = await c.send_message(chat_id, "🔄 **processing stream...**")
         else:
             await m.reply("**/vstream {link} {720/480/360}**")
 
         regex = r"^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+"
         match = re.match(regex, link)
         if match:
-            amort, livelink = await ytdl(link)
+            veez, livelink = await ytdl(link)
         else:
             livelink = link
-            amort = 1
+            veez = 1
 
-        if amort == 0:
-            await loser.edit(f"❌تم اكتشاف مشكلات yt-dl\n\n» `{livelink}`")
+        if veez == 0:
+            await loser.edit(f"❌ yt-dl issues detected\n\n» `{livelink}`")
         else:
             if chat_id in QUEUE:
                 pos = add_to_queue(chat_id, "Live Stream", livelink, link, "Video", Q)
@@ -398,7 +405,7 @@ async def vstream(c: Client, m: Message):
                 requester = f"[{m.from_user.first_name}](tg://user?id={m.from_user.id})"
                 await m.reply_photo(
                     photo=f"{IMG_1}",
-                    caption=f"💡 **تمت إضافة المسار إلى قائمة الانتظار »** `{pos}`\n\n💭 **الدردشه:** `{chat_id}`\n🎧 **بواسطه:** {requester}",
+                    caption=f"💡 **Track added to queue »** `{pos}`\n\n💭 **Chat:** `{chat_id}`\n🎧 **Request by:** {requester}",
                     reply_markup=keyboard,
                 )
             else:
@@ -409,7 +416,7 @@ async def vstream(c: Client, m: Message):
                 elif Q == 360:
                     amaze = LowQualityVideo()
                 try:
-                    await loser.edit("🔄 **انضمام vc...**")
+                    await loser.edit("🔄 **Joining vc...**")
                     await call_py.join_group_call(
                         chat_id,
                         AudioVideoPiped(
@@ -426,9 +433,9 @@ async def vstream(c: Client, m: Message):
                     )
                     await m.reply_photo(
                         photo=f"{IMG_2}",
-                        caption=f"💡 **[فيديو مباشر]({link}) بدأ التشغيل.**\n\n💭 **الدردشه:** `{chat_id}`\n💡 **الحاله:** `يشغل`\n🎧 **بواسطه:** {requester}",
+                        caption=f"💡 **[Video live]({link}) stream started.**\n\n💭 **Chat:** `{chat_id}`\n💡 **Status:** `Playing`\n🎧 **Request by:** {requester}",
                         reply_markup=keyboard,
                     )
                 except Exception as ep:
                     await loser.delete()
-                    await m.reply_text(f"🚫 خطأ: `{ep}`")
+                    await m.reply_text(f"🚫 error: `{ep}`")
