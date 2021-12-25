@@ -212,7 +212,7 @@ async def vplay(c: Client, m: Message):
                             requester = f"[{m.from_user.first_name}](tg://user?id={m.from_user.id})"
                             await m.reply_photo(
                                 photo=thumbnail,
-                                caption=f"💡 ** تمت إضافة المسار إلى قائمة الانتظار»** `{pos}`\n\n🏷 **اسم:** [{songname}]({url}) | `فديو`\n⏱ **Duration:** `{duration}`\n🎧 **بواسطه:** {requester}",
+                                caption=f"💡 ** تمت إضافة المسار إلى قائمة الانتظار»** `{pos}`\n\n🏷 **اسم:** [{songname}]({url}) | `فديو`\n⏱ **الوقت:** `{duration}`\n🎧 **بواسطه:** {requester}",
                                 reply_markup=keyboard,
                             )
                         else:
@@ -232,7 +232,7 @@ async def vplay(c: Client, m: Message):
                                 requester = f"[{m.from_user.first_name}](tg://user?id={m.from_user.id})"
                                 await m.reply_photo(
                                     photo=thumbnail,
-                                    caption=f"🏷 **اسم:** [{songname}]({url})\n⏱ **Duration:** `{duration}`\n💡 ** الحالة: ** `يشغل`\n🎧 **بواسطه:** {requester}\n📹 ** نوع البث:** `فديو`",
+                                    caption=f"🏷 **اسم:** [{songname}]({url})\n⏱ **الوقت:** `{duration}`\n💡 ** الحالة: ** `يشغل`\n🎧 **بواسطه:** {requester}\n📹 ** نوع البث:** `فديو`",
                                     reply_markup=keyboard,
                                 )
                             except Exception as ep:
@@ -269,7 +269,7 @@ async def vplay(c: Client, m: Message):
                         )
                         await m.reply_photo(
                             photo=thumbnail,
-                            caption=f"💡 ** تمت إضافة المسار إلى قائمة الانتظار»** `{pos}`\n\n🏷 **اسم:** [{songname}]({url}) | `فديو`\n⏱ **Duration:** `{duration}`\n🎧 **بواسطه:** {requester}",
+                            caption=f"💡 ** تمت إضافة المسار إلى قائمة الانتظار»** `{pos}`\n\n🏷 **اسم:** [{songname}]({url}) | `فديو`\n⏱ **الوقت:** `{duration}`\n🎧 **بواسطه:** {requester}",
                             reply_markup=keyboard,
                         )
                     else:
@@ -289,7 +289,7 @@ async def vplay(c: Client, m: Message):
                             requester = f"[{m.from_user.first_name}](tg://user?id={m.from_user.id})"
                             await m.reply_photo(
                                 photo=thumbnail,
-                                caption=f"🏷 **اسم:** [{songname}]({url})\n⏱ **Duration:** `{duration}`\n💡 ** الحالة: ** `يشغل`\n🎧 **بواسطه:** {requester}\n📹 ** نوع البث:** `فديو`",
+                                caption=f"🏷 **اسم:** [{songname}]({url})\n⏱ **الوقت:** `{duration}`\n💡 ** الحالة: ** `يشغل`\n🎧 **بواسطه:** {requester}\n📹 ** نوع البث:** `فديو`",
                                 reply_markup=keyboard,
                             )
                         except Exception as ep:
