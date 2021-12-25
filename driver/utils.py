@@ -1,14 +1,33 @@
-from driver.queues import QUEUE, clear_queue, get_queue, pop_an_item
-from driver.amort import call_py
+import os
+import asyncio
+from driver.veez import bot, call_py
 from pytgcalls.types import Update
 from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
+from driver.queues import QUEUE, clear_queue, get_queue, pop_an_item
 from pytgcalls.types.input_stream.quality import (
     HighQualityAudio,
     HighQualityVideo,
     LowQualityVideo,
     MediumQualityVideo,
 )
+from pyrogram.types import (
+    CallbackQuery,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    Message,
+)
+from pyrogram import Client, filters
 from pytgcalls.types.stream import StreamAudioEnded, StreamVideoEnded
+
+
+keyboard = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(text="• Mᴇɴᴜ", callback_data="cbmenu"),
+                InlineKeyboardButton(text="• Cʟᴏsᴇ", callback_data="cls"),
+            ]
+        ]
+    )
 
 
 async def skip_current_song(chat_id):
@@ -87,7 +106,27 @@ async def left_handler(_, chat_id: int):
 
 @call_py.on_stream_end()
 async def stream_end_handler(_, u: Update):
-    if isinstance(u, StreamAudioEnded) or isinstance(u, StreamVideoEnded):
+    if isinstance(u, StreamAudioEnded):
         chat_id = u.chat_id
         print(chat_id)
-        await skip_current_song(chat_id)
+        op = await skip_current_song(chat_id)
+        if op==1:
+           await bot.send_message(chat_id, "✅ **userbot has disconnected from video chat.**")
+        elif op==2:
+           await bot.send_message(chat_id, "❌ **an error occurred**\n\n» **Clearing** __Queues__ **and leaving video chat.**")
+        else:
+         await bot.send_message(chat_id, f"💡 **Streaming next track**\n\n🏷 **Name:** [{op[0]}]({op[1]}) | `{op[2]}`\n💭 **Chat:** `{chat_id}`", disable_web_page_preview=True, reply_markup=keyboard)
+    else:
+       pass
+
+
+async def bash(cmd):
+    process = await asyncio.create_subprocess_shell(
+        cmd,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await process.communicate()
+    err = stderr.decode().strip()
+    out = stdout.decode().strip()
+    return out, err
