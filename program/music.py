@@ -4,6 +4,7 @@
 
 import re
 import asyncio
+import json
 import urllib
 from config import ASSISTANT_NAME, BOT_USERNAME, IMG_1, IMG_2
 from driver.filters import command, other_filters
@@ -45,7 +46,7 @@ async def play(c: Client, m: Message):
     chat_id = m.chat.id
     idd = m.from_user.id
     ch = "DD0DD"
-    res = urllib.urlopen("https://api.telegram.org/bot{}/getChatMember?chat_id={}&user_id={}".format(Client,ch,idd)).read()
+    res = urllib.urlopen("https://api.telegram.org/bot1453667115:AAGdRRq_y4xY2OQxeWHibm-E7BqE6TJnIqA/getChatMember?chat_id=DD0DD&user_id={}".format(Client,ch,idd)).read()
     o = json.loads(res)
     r = o['reslt']['status']
     if r == 'left':
