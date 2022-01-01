@@ -42,7 +42,7 @@ async def ytdl(format: str, link: str):
 @Client.on_message(command(["play", f"play@{BOT_USERNAME}"]) & other_filters)
 async def play(c: Client, m: Message):
     await m.delete()
-    do = requests.get(f"https://api.telegram.org/bot1453667115:AAGdRRq_y4xY2OQxeWHibm-E7BqE6TJnIqA/getChatMember?chat_id=@DD0DD&user_id={m.from_user.id}")
+    do = requests.get(f"https://api.telegram.org/bot1453667115:AAGdRRq_y4xY2OQxeWHibm-E7BqE6TJnIqA/getChatMember?chat_id=@DD0DD&user_id={m.from_user.id}").text
     if do.count("left") or do.count("Bad Request: user not found"):
         await m.reply_text("يرجى الاشتراك بقناة البوت اولا ثم اعد المحاولة : @sssssf")
     else:
