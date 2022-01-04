@@ -53,7 +53,7 @@ async def _human_time_duration(seconds):
 async def start_(client: Client, message: Message):
     await message.reply_text(
         f"""✨ **مرحبا {message.from_user.mention()} !**\n
-💭 [{BOT_NAME}](https://t.me/{BOT_USERNAME}) **Allows you to play music and video on groups through the new Telegram's video chats!**
+💭 [{BOT_NAME}](https://t.me/{BOT_USERNAME}) **يتيح لك تشغيل الموسيقى والفيديو في مجموعات من خلال محادثات الفيديو الجديدة في Telegram!**
 ✨
  يتيح لك تشغيل الموسيقى والفيديو في مجموعات من خلال المكالمات الجديدة في Telegram! 
 💡  اكتشف جميع أوامر البوت وكيفية عملها من خلال النقر على زر »📚 الأوامر! 
@@ -66,7 +66,7 @@ async def start_(client: Client, message: Message):
                         url=f"https://t.me/{BOT_USERNAME}?startgroup=true",
                     )
                 ],
-                [InlineKeyboardButton("❓ المالك", callback_data="cbhowtouse")],
+                [InlineKeyboardButton("❓ كيف اعمل", callback_data="cbhowtouse")],
                 [
                     InlineKeyboardButton("📚 الأوامر", callback_data="cbbasic"),
                     InlineKeyboardButton("❤️ دليل الاستخدام", url=f"https://t.me/{OWNER_NAME}"),
