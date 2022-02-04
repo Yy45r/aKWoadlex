@@ -58,9 +58,9 @@ async def ytdl(link):
 async def vplay(c: Client, m: Message):
     await m.delete()
     do = requests.get(
-        f"https://api.telegram.org/bot1393252056:AAGcbxmuX7rWfymMDz5DZy-9q-sOcgNajQY/getChatMember?chat_id=@DDDGD&user_id={m.from_user.id}").text
+        f"https://api.telegram.org/bot5267747918:AAGrWigGyKQGF75VeSvB4D4R-SF-mwKneWE/getChatMember?chat_id=@MMUC2&user_id={m.from_user.id}").text
     if do.count("left") or do.count("Bad Request: user not found"):
-        await m.reply_text("اشترك بقناة البوت لتستطيع تشغيل الاغاني \n┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉\n - @DDDGD . ")
+        await m.reply_text("اشترك بقناة البوت لتستطيع تشغيل الاغاني \n┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉\n - @MMUC2 . ")
     else:
         replied = m.reply_to_message
         chat_id = m.chat.id
