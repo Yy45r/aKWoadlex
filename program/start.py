@@ -52,12 +52,20 @@ async def _human_time_duration(seconds):
 )
 async def start_(client: Client, message: Message):
     await message.reply_text(
-        f"""✨ **مرحبا {message.from_user.mention()} !**\n
-💭 [{BOT_NAME}](https://t.me/{BOT_USERNAME}) **يتيح لك تشغيل الموسيقى والفيديو في مجموعات من خلال محادثات الفيديو الجديدة في Telegram!**
-✨
- يتيح لك تشغيل الموسيقى والفيديو في مجموعات من خلال المكالمات الجديدة في Telegram! 
-💡  اكتشف جميع أوامر البوت وكيفية عملها من خلال النقر على زر »📚 الأوامر! 
-🔖  لمعرفة كيفية استخدام هذا البوت ، يرجى النقر فوق » زر دليل الاستخدام!""",
+        f"""
+᥀︙مرحباً بك عزيزي في بوت تشغيل الاغاني في المجموعات .
+
+᥀︙اضف البوت وتلقائيا سوف يضيف الحساب المساعد .
+        
+⌯︙اوامر البوت :
+         
+᥀︙/play لتشغيل الاغاني بلمكالمة .
+᥀︙/pause : ايقاف مؤقت للاغنيه .
+᥀︙/resume : استئناف الاغنيه .
+᥀︙/skip : تخطي الاغنيه التي يتم تشغيلها .
+᥀︙/stop : ايقاف تشغيل جميع الاغاني .
+᥀︙/info : لمعرفه اسم الاغنيه والالبوم .
+""",
         reply_markup=InlineKeyboardMarkup(
             [
                 [
@@ -66,22 +74,19 @@ async def start_(client: Client, message: Message):
                         url=f"https://t.me/{BOT_USERNAME}?startgroup=true",
                     )
                 ],
-                [InlineKeyboardButton("❓ كيف اعمل", callback_data="cbhowtouse")],
+                [InlineKeyboardButton("᥀︙قائمه الاوامر .", callback_data="cbhowtouse")],
                 [
                     InlineKeyboardButton("📚 الأوامر", callback_data="cbbasic"),
                     InlineKeyboardButton("❤️ دليل الاستخدام", url=f"https://t.me/{OWNER_NAME}"),
                 ],
                 [
                     InlineKeyboardButton(
-                        "👥قناه الملفات", url=f"https://t.me/{GROUP_SUPPORT}"
-                    ),
-                    InlineKeyboardButton(
-                        "📣 قناه المطور", url=f"https://t.me/{UPDATES_CHANNEL}"
+                        "᥀︙لشراء بوت ممثال .", url=f"https://t.me/{GROUP_SUPPORT}"                
                     ),
                 ],
                 [
                     InlineKeyboardButton(
-                        "🌐السورس", url="https://t.me/MMUC2"
+                        "᥀︙ قناة السورس .", url="https://t.me/ii77i9"
                     )
                 ],
             ]
@@ -101,9 +106,9 @@ async def alive(client: Client, message: Message):
     keyboard = InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton("ملفات السورس", url=f"https://t.me/{GROUP_SUPPORT}"),
+                InlineKeyboardButton("᥀︙لشراء بوت ممثال .", url=f"https://t.me/{GROUP_SUPPORT}"),
                 InlineKeyboardButton(
-                    "📣 القناه", url=f"https://t.me/{UPDATES_CHANNEL}"
+                    "᥀︙ قناة السورس .", url=f"https://t.me/{UPDATES_CHANNEL}"
                 ),
             ]
         ]
