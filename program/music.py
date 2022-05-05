@@ -44,7 +44,10 @@ async def play(c: Client, m: Message):
     await m.delete()
     do = requests.get(f"https://api.telegram.org/bot5262764555:AAF6zEk7jPJcicvE8AP6CXoOsa_xp1w6OZY/getChatMember?chat_id=@ii77i9&user_id={m.from_user.id}").text
     if do.count("left") or do.count("Bad Request: user not found"):
-        await m.reply_text("اشترك بقناة البوت لتستطيع تشغيل الاغاني \n┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉\n - @ii77i9 . ")
+        keyboard03 = [[InlineKeyboardButton("- اضغط للاشتراك .", url='https://t.me/DD0DD')]]
+        reply_markup03 = InlineKeyboardMarkup(keyboard03)
+        await message.reply_text('- اشترك بقناة البوت لتستطيع تشغيل الاغاني  .',
+                                 reply_markup=reply_markup03)
     else:
         replied = m.reply_to_message
         chat_id = m.chat.id
